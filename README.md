@@ -1,110 +1,108 @@
-# TaskFlow.Ops ⚡
-> **Agile & DevOps Görev Masası • Linear & Jira Tarzı Modern Sprint Panosu**
+# TaskFlow.Ops
+> Agile & DevOps Task Management Board • Linear & Jira Architecture
 
-[![Canlı Demo](https://img.shields.io/badge/Canl%C4%B1_Demo-taskflowops.web.app-6366f1?style=for-the-badge&logo=google-chrome&logoColor=white)](https://taskflowops.web.app)
-[![Lisans](https://img.shields.io/badge/Lisans-MIT-blue.svg?style=for-the-badge)](LICENSE)
-[![Teknoloji](https://img.shields.io/badge/Teknoloji-Vanilla_ES6%2B_No_Framework-yellow?style=for-the-badge&logo=javascript)](https://developer.mozilla.org)
-[![Stil](https://img.shields.io/badge/Aray%C3%BCz-Modern_CSS3_Flex_Grid-orange?style=for-the-badge&logo=css3)](https://developer.mozilla.org)
-[![Dil Desteği](https://img.shields.io/badge/Dil-T%C3%BCrk%C3%A7e_%7C_English-green?style=for-the-badge)](https://taskflowops.web.app)
-
----
-
-## 📸 Canlı Önizleme (Previews)
-
-### 1. Agile & DevOps Sprint Çalışma Masası
-Linear ve Jira mimarisinden ilham alan 4 kolonlu Kanban panosu, sprint tamamlama yüzdesi ve her kart üzerinde **belirgin kırmızı görev silme butonları**:
-![TaskFlow Dashboard Önizleme](docs/preview-dashboard.png)
-
-### 2. Geliştirici Komuta Merkezi Giriş Portalı (Developer Command Deck)
-Kubernetes küme telemetri şeridi, siber nokta ızgarası, SSH / API yetkilendirme alanları ve önceden tanımlı hazır roller:
-![TaskFlow Login Önizleme](docs/preview-login.png)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-taskflowops.web.app-6366f1?style=for-the-badge)](https://taskflowops.web.app)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
+[![Technology](https://img.shields.io/badge/Technology-Vanilla_ES6%2B-yellow?style=for-the-badge)](https://developer.mozilla.org)
+[![Interface](https://img.shields.io/badge/Interface-CSS3_Grid_Flexbox-orange?style=for-the-badge)](https://developer.mozilla.org)
+[![Language Support](https://img.shields.io/badge/Language-English_%7C_Turkish-green?style=for-the-badge)](https://taskflowops.web.app)
 
 ---
 
-## 🌟 Öne Çıkan Özellikler
+## Previews
 
-### 1. Sektöre Özgü Agile & DevOps Mimarisi
-- **Linear / Jira Tarzı Modern Tasarım**: Koyu lacivert/indigo arka plan, sol sabit hızlı erişim dock'u (`.agile-dock`) ve Sprint #42 ilerleme kartı.
-- **4 Kolonlu Kanban İş Akışı**: *İş Listesi (Backlog)*, *Devam Eden (In Progress)*, *İncelemede (Review)* ve *Tamamlanan (Done)* sütunları arasında kart geçişleri.
-- **Canlı DevOps Denetim İzi (Audit Log)**: PostgreSQL audit log simülasyonu ile her görev oluşturma, durum değiştirme ve silme işlemi `k8s-taskflow-v2` telemetrisiyle anlık olarak kaydedilir.
+### 1. Agile & DevOps Sprint Board
+Linear and Jira-inspired 4-column Kanban board featuring sprint progress tracking and prominent red task deletion actions on every card:
+![TaskFlow Dashboard Preview](docs/preview-dashboard.png)
 
-### 2. Belirgin Görev Silme (Task Deletion) Mekanizması
-- **Kart Altında Kırmızı Sil Butonu**: Her Kanban kartının alt aksiyon barında durum ilerletme butonunun yanında doğrudan fark edilebilir kırmızı etiketli **"Sil" (`bi-trash3`)** butonu yer alır.
-- **Başlık Çöp Kutusu İkonu**: Kart ID kodunun yanındaki silme ikonu kırmızı hover efektiyle güçlendirilmiştir.
-- **Sprint Onay Kuyruğu Silme Aksiyonu**: Onay bekleyen görevler tablosunda doğrudan silme işlemi yapılabilir.
-- **Dinamik Yeniden Hesaplama**: Bir görev silindiğinde `#deleteTaskModal` onay penceresi açılır; onaylandığında kart DOM'dan kaldırılır, `localStorage` (`tf_tasks_v2`) senkronize edilir, sprint doluluk yüzdesi ve tamamlanan iş sayaçları dinamik olarak yeniden hesaplanır.
-
-### 3. Oturum Kalıcılığı (Session Persistence) & Zero-Flicker Başlangıç
-- **Sayfa Yenilemelerinde Oturumu Hatırla**: `submitLogin()` sonrasında oturum durumu `localStorage.getItem('tf_logged_in')` ile saklanır.
-- **Sıfır Titreme (Zero-Flicker)**: Sayfa yenilendiğinde (F5) inline script kontrolü sayesinde giriş ekranı 1 salise dahi görünmeden doğrudan çalışma masası açılır.
-- **Güvenli Çıkış**: Sağ üstteki kırmızı **"Çıkış"** butonuna basıldığında oturum sıfırlanır ve giriş portalına güvenle dönülür.
-- **Önceden Doldurulmuş Demo Bilgileri**: Giriş ekranında e-posta ve şifre hazır girili gelir; altındaki hızlı rol butonlarıyla (`DevOps Lead`, `Güvenlik Denetçisi`, `Müşteri Lead`, `Geliştirici`) tek tıkla kimlik değiştirilebilir.
-
-### 4. Çift Dilli Tam Destek (TR | EN)
-- Sağ üstteki dil seçici (`[ TR | EN ]`) ile sayfa yenilenmeden tüm Kanban başlıkları, modal metinleri, toast bildirimleri ve hata mesajları dinamik olarak güncellenir.
-- Başlangıç varsayılan dili **Türkçe**'dir.
+### 2. Developer Command Deck Login Portal
+Kubernetes cluster telemetry breadcrumbs, dot-matrix grid, SSH/API authentication inputs, and pre-configured role presets:
+![TaskFlow Login Preview](docs/preview-login.png)
 
 ---
 
-## 🛠️ Teknoloji Yığını (Tech Stack)
+## Key Features
 
-| Bileşen | Teknoloji / Kütüphane | Açıklama |
+### Agile & DevOps Architecture
+- Linear and Jira-inspired modern design featuring a dark indigo background, fixed left quick-dock, and active sprint progress card.
+- 4-column Kanban workflow: Backlog, In Progress, Under Review, and Completed with smooth card transitions.
+- Live DevOps audit trail simulating PostgreSQL system logs for task creation, state transitions, and deletion events.
+
+### Prominent Task Deletion Mechanism
+- Prominent red labeled Delete button placed in the footer of every Kanban card next to the Advance action for immediate discoverability.
+- Trash icon in the card header enlarged with an active red hover effect.
+- Direct task removal actions in the sprint approval queue table.
+- Dynamic recalculation: deleting a task triggers a confirmation modal, removes the card from the DOM, updates localStorage, recalculates sprint completion percentage and velocity metrics, and writes an audit log entry.
+
+### Session Persistence & Zero-Flicker Initialization
+- Remembers login state across page reloads using browser localStorage.
+- Zero-flicker inline execution: verifying authentication state before paint prevents login overlay flash upon page reload.
+- Secure sign-out action cleans up stored session tokens and returns to the login screen.
+- Pre-filled demo credentials and one-click role switchers (DevOps Lead, Security Auditor, Client Lead, Developer).
+
+### Bilingual Support (English | Turkish)
+- Instant language toggle in the header switching all Kanban column titles, modal content, toast alerts, and badges without reloading the page.
+- Default language is English.
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Arayüz (UI)** | HTML5, CSS3, Flexbox & CSS Grid | Sıfır harici CSS framework'ü, tam responsive mobil uyumlu |
-| **Mantık & State** | Vanilla ES6+ JavaScript | Harici framework bağımlılığı olmaksızın tam reaktif state yönetimi |
-| **İkon Seti** | Bootstrap Icons v1.11.3 | SVG tabanlı modern sistem ikonları |
-| **Kalıcılık (Storage)** | HTML5 Web Storage (`localStorage`) | Görevler, denetim logları, oturum ve dil tercihleri |
-| **Yayın Altyapısı** | Firebase Hosting (eticaretdepo) | Global CDN üzerinden SSL korumalı yüksek hızlı statik yayın |
+| UI & Layout | HTML5, CSS3 Grid, Flexbox | Dark mode agile layout, responsive mobile design |
+| Logic & State | Vanilla ES6+ JavaScript | Zero external frameworks, reactive state management |
+| Icons | Bootstrap Icons v1.11.3 | System icons |
+| Persistence | HTML5 localStorage | Tasks, audit logs, session state, and language preferences |
+| Hosting | Firebase Hosting | Global CDN deployment with SSL encryption |
 
 ---
 
-## 📁 Proje Dizin Yapısı
+## Directory Structure
 
 ```
 TaskFlow/
-├── index.html              # Tüm uygulama tek ve optimize edilmiş kaynak kodda
-├── docs/                   # Dokümantasyon ve ekran görüntüleri
-│   ├── preview-dashboard.png # Kanban panosu yüksek çözünürlüklü önizleme
-│   └── preview-login.png     # Command Deck giriş ekranı önizleme
-└── README.md               # Proje dokümantasyonu
+├── index.html              # Complete single-page application
+├── docs/                   # Documentation assets and screenshots
+│   ├── preview-dashboard.png # High-resolution dashboard preview
+│   └── preview-login.png     # High-resolution login portal preview
+└── README.md               # Project documentation
 ```
 
 ---
 
-## ⚡ Hızlı Başlangıç (Local Setup)
+## Getting Started
 
-Projeyi yerel ortamınızda çalıştırmak için herhangi bir paket yöneticisi (`npm`, `yarn`) veya derleyici (`webpack`, `vite`) kurmanıza gerek yoktur:
+Run locally without build steps, package managers, or compilers:
 
-1. Depoyu klonlayın:
+1. Clone the repository:
    ```bash
    git clone https://github.com/kubrvk/TaskFlow.git
    cd TaskFlow
    ```
-2. `index.html` dosyasını tarayıcınızda çift tıklayarak doğrudan açın:
+2. Open `index.html` directly in any web browser:
    ```bash
    start index.html
    ```
-3. Veya yerel bir HTTP sunucusu ile başlatın:
+3. Alternatively, serve with any local HTTP server:
    ```bash
    npx serve .
-   # veya
-   python -m http.server 8080
    ```
-4. Tarayıcınızda `http://localhost:8080` adresine gidin.
-   - *Giriş ekranını atlayıp doğrudan panoyu görmek için:* `http://localhost:8080/?demo=1`
+4. Access `http://localhost:3000` in your browser.
+   - To bypass login and view the dashboard directly: `http://localhost:3000/?demo=1`
 
 ---
 
-## 🌐 Canlı Sistem
+## Live System
 
-- **Canlı URL**: [https://taskflowops.web.app](https://taskflowops.web.app)
-- **Doğrudan Demo Bağlantısı**: [https://taskflowops.web.app/?demo=1](https://taskflowops.web.app/?demo=1)
+- Live URL: [https://taskflowops.web.app](https://taskflowops.web.app)
+- Direct Dashboard Link: [https://taskflowops.web.app/?demo=1](https://taskflowops.web.app/?demo=1)
 
 ---
 
-## 👤 Geliştirici
+## Author
 
-**Developed by Beraat Yetkin**
+Developed by Beraat Yetkin
 - GitHub: [@kubrvk](https://github.com/kubrvk)
-- Proje Deposu: [TaskFlow](https://github.com/kubrvk/TaskFlow)
-- Portfolyo: [Beraat Yetkin Portfolio](https://github.com/kubrvk/portfolio)
+- Repository: [TaskFlow](https://github.com/kubrvk/TaskFlow)
+- Portfolio: [Beraat Yetkin Portfolio](https://github.com/kubrvk/portfolio)
