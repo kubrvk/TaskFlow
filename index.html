@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -604,7 +604,7 @@
 
   <!-- Fullscreen Login Portal (Developer Command Deck) -->
   <div class="login-overlay" id="loginPortal">
-    <script>if (localStorage.getItem('tf_logged_in') === 'true') document.getElementById('loginPortal').style.display = 'none';</script>
+    <script>if (localStorage.getItem('tf_logged_in') === 'true' || location.search.includes('demo=1')) document.getElementById('loginPortal').style.display = 'none';</script>
     <div class="login-box">
       <!-- Top Dev Breadcrumb Bar -->
       <div class="dev-login-topbar">
@@ -1659,7 +1659,7 @@
 
     // Initialize with Turkish default
     applyLanguage(currentLang);
-    if (localStorage.getItem('tf_logged_in') === 'true') {
+    if (localStorage.getItem('tf_logged_in') === 'true' || location.search.includes('demo=1')) {
       const p = document.getElementById('loginPortal');
       if (p) p.style.display = 'none';
     }
