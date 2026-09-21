@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow Enterprise — Personnel &amp; Task Orchestration</title>
+  <meta name="description" content="TaskFlow: Enterprise task orchestration, hierarchical approvals, and immutable audit logs. Developed by Beraat Yetkin.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Cpath d='M9 10h14M9 16h10M9 22h14' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='16' r='2' fill='%2338bdf8'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-subtle: #eff6ff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.07);
+    }
+    [data-theme="dark"] {
+      --bg: #090d16;
+      --surface: #0f1523;
+      --card: #151d30;
+      --border: #1e293b;
+      --border-strong: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --primary-subtle: rgba(59, 130, 246, 0.15);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      line-height: 1.5;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.88rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text); }
+    .btn-outline:hover { background: var(--border); }
+    .btn-theme { padding: 0.5rem 0.75rem; color: var(--text-muted); }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.75rem;
+      background: var(--primary-subtle);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    .lang-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: var(--primary-subtle);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.3rem 0.6rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: var(--text-muted);
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .lang-toggle:hover { background: var(--border); }
+    .lang-toggle span.active { color: var(--primary); font-weight: 800; }
+
+    main {
+      flex: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1.75rem 2rem;
+      width: 100%;
+    }
+
+    /* KPI Cards */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 1.75rem; font-weight: 800; margin: 0.25rem 0; font-family: var(--font-mono); }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      padding: 0.65rem 1.25rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+
+    /* Kanban Board */
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.25rem;
+      align-items: flex-start;
+    }
+    .kanban-col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem;
+      min-height: 520px;
+      box-shadow: var(--shadow-sm);
+    }
+    .col-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.65rem;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .col-count {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+    .task-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .task-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+    .task-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+    .task-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+      font-size: 0.78rem;
+    }
+    .task-id { font-family: var(--font-mono); color: var(--text-muted); font-weight: 600; }
+    .task-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .badge-critical { background: #fee2e2; color: #b91c1c; }
+    .badge-high { background: #fef3c7; color: #b45309; }
+    .badge-medium { background: #e0f2fe; color: #0369a1; }
+    .badge-low { background: #dcfce7; color: #15803d; }
+    .task-title { font-size: 0.98rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text); }
+    .task-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.45; }
+    .task-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 0.5rem;
+    }
+
+    /* Approvals Table */
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      background: var(--bg);
+      padding: 0.9rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--primary-subtle); }
+
+    /* Audit Stream */
+    .audit-list { display: flex; flex-direction: column; gap: 0.65rem; }
+    .audit-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 6px;
+      padding: 0.85rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      font-family: var(--font-mono);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+    .modal-backdrop.active { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 480px;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .modal-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .form-control {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border-strong);
+      border-radius: 6px;
+      padding: 0.65rem 0.85rem;
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .form-control:focus { outline: none; border-color: var(--primary); }
+
+    /* Footer */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon"><i class="bi bi-kanban"></i></div>
+      <span>TaskFlow<span style="color:var(--primary)">.Enterprise</span></span>
+    </div>
+
+    <div class="header-right">
+      <div class="lang-toggle" onclick="toggleLanguage()">
+        <span id="langTr" class="active">TR</span>
+        <span style="opacity:0.4;">|</span>
+        <span id="langEn">EN</span>
+      </div>
+
+      <button class="btn btn-outline btn-theme" onclick="toggleTheme()" title="Temayı Değiştir" id="btnTheme">
+        <i class="bi bi-moon-stars" id="themeIcon"></i>
+      </button>
+
+      <div class="user-pill" id="userPill" onclick="openAuthModal()">
+        <i class="bi bi-person-circle"></i>
+        <span id="userNameText">Proje Yöneticisi</span>
+      </div>
+
+      <button class="btn btn-primary" onclick="openNewTaskModal()" id="btnNewTask">
+        <i class="bi bi-plus-lg"></i> <span id="lblBtnNewTask">Yeni İş Kalemi</span>
+      </button>
+
+      <a href="https://github.com/kubrvk/TaskFlow" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+        <i class="bi bi-github"></i> GitHub
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label" id="kpiLabelTotal">Aktif İş Kalemleri</div>
+        <div class="kpi-value" id="kpiTotal" style="color:var(--primary);">10</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="kpiLabelReview">Onay Bekleyen</div>
+        <div class="kpi-value" id="kpiReview" style="color:var(--warning);">2</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="kpiLabelDone">Tamamlanan &amp; Yayında</div>
+        <div class="kpi-value" id="kpiDone" style="color:var(--accent);">3</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label" id="kpiLabelAudit">PostgreSQL Denetim İzi</div>
+        <div class="kpi-value" id="kpiAudit">1,848</div>
+      </div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="setTab('kanban', this)" id="tabBtnKanban"><i class="bi bi-columns-gap"></i> <span id="lblTabKanban">Kanban Panosu</span></button>
+      <button class="tab-btn" onclick="setTab('approvals', this)" id="tabBtnApprovals"><i class="bi bi-check2-circle"></i> <span id="lblTabApprovals">Onay Kuyruğu</span> (<span id="approvalBadge">2</span>)</button>
+      <button class="tab-btn" onclick="setTab('audit', this)" id="tabBtnAudit"><i class="bi bi-journal-code"></i> <span id="lblTabAudit">Değişmez Denetim Günlüğü</span></button>
+    </div>
+
+    <!-- TAB 1: KANBAN -->
+    <div id="tab-kanban" class="tab-pane">
+      <div class="kanban-board">
+        <div class="kanban-col">
+          <div class="col-header">
+            <span><i class="bi bi-inbox"></i> <span id="colHeaderBacklog">İş Listesi</span></span>
+            <span class="col-count" id="count-backlog">0</span>
+          </div>
+          <div class="task-list" id="col-backlog"></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="col-header" style="color:var(--primary);">
+            <span><i class="bi bi-arrow-repeat"></i> <span id="colHeaderInProgress">Devam Eden</span></span>
+            <span class="col-count" id="count-in_progress">0</span>
+          </div>
+          <div class="task-list" id="col-in_progress"></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="col-header" style="color:var(--warning);">
+            <span><i class="bi bi-shield-lock"></i> <span id="colHeaderReview">İncelemede</span></span>
+            <span class="col-count" id="count-review">0</span>
+          </div>
+          <div class="task-list" id="col-review"></div>
+        </div>
+
+        <div class="kanban-col">
+          <div class="col-header" style="color:var(--accent);">
+            <span><i class="bi bi-check-circle-fill"></i> <span id="colHeaderDone">Tamamlandı</span></span>
+            <span class="col-count" id="count-done">0</span>
+          </div>
+          <div class="task-list" id="col-done"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: APPROVALS -->
+    <div id="tab-approvals" class="tab-pane" style="display:none;">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th id="thAppId">ID</th>
+              <th id="thAppTitle">Görev Kalemi</th>
+              <th id="thAppAssignee">Sorumlu Rol</th>
+              <th id="thAppPrio">Öncelik</th>
+              <th id="thAppActions">İşlemler</th>
+            </tr>
+          </thead>
+          <tbody id="approvalsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB 3: AUDIT -->
+    <div id="tab-audit" class="tab-pane" style="display:none;">
+      <div class="audit-list" id="auditList"></div>
+    </div>
+  </main>
+
+  <!-- Create Task Modal -->
+  <div class="modal-backdrop" id="newTaskModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="createModalTitle">Yeni İş Kalemi Oluştur</h3>
+      <form id="taskForm" onsubmit="handleCreateTask(event)">
+        <div class="form-group">
+          <label class="form-label" id="lblTaskTitle">Görev Başlığı</label>
+          <input type="text" class="form-control" id="taskTitleInput" required placeholder="Örn: Spring Security 6 RBAC Ağ Geçidi">
+        </div>
+        <div class="form-group">
+          <label class="form-label" id="lblTaskDesc">Kapsam &amp; Açıklama</label>
+          <textarea class="form-control" id="taskDescInput" rows="3" required placeholder="Teknik hedefleri ve kabul kriterlerini belirtin..."></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-group">
+            <label class="form-label" id="lblTaskPrio">Öncelik</label>
+            <select class="form-control" id="taskPrioInput">
+              <option value="critical">Kritik (Critical)</option>
+              <option value="high" selected>Yüksek (High)</option>
+              <option value="medium">Orta (Medium)</option>
+              <option value="low">Düşük (Low)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" id="lblTaskAssignee">Sorumlu Rol</label>
+            <input type="text" class="form-control" id="taskAssigneeInput" required value="Proje Yöneticisi">
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1.5rem;">
+          <button type="button" class="btn btn-outline" onclick="closeNewTaskModal()" id="btnCancelTask">Vazgeç</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitTask">İş Kalemini Oluştur</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- User Login / Register Modal -->
+  <div class="modal-backdrop" id="authModal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="authModalTitle">Kurumsal Kimlik &amp; Erişim</h3>
+      <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:1.25rem;" id="authModalDesc">Rol tabanlı operasyonel profil seçiniz:</p>
+      
+      <div style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;">
+        <button class="btn btn-outline" style="justify-content:flex-start;" onclick="setRoleByPreset(0)">
+          <i class="bi bi-person-fill-gear"></i> <span id="roleOpt0">Rol: <strong>Proje Yöneticisi (DevOps Lead)</strong></span>
+        </button>
+        <button class="btn btn-outline" style="justify-content:flex-start;" onclick="setRoleByPreset(1)">
+          <i class="bi bi-shield-check"></i> <span id="roleOpt1">Rol: <strong>Güvenlik Denetçisi (Security Auditor)</strong></span>
+        </button>
+        <button class="btn btn-outline" style="justify-content:flex-start;" onclick="setRoleByPreset(2)">
+          <i class="bi bi-briefcase"></i> <span id="roleOpt2">Rol: <strong>Müşteri Temsilcisi (Client Lead)</strong></span>
+        </button>
+        <button class="btn btn-outline" style="justify-content:flex-start;" onclick="setRoleByPreset(3)">
+          <i class="bi bi-person"></i> <span id="roleOpt3">Rol: <strong>Kullanıcı / Geliştirici (Platform Eng)</strong></span>
+        </button>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;">
+        <button type="button" class="btn btn-outline" onclick="closeAuthModal()" id="authBtnClose">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strict Standard Footer -->
+  <footer>
+    <div>Developed by Beraat Yetkin</div>
+    <div>
+      <a href="https://github.com/kubrvk/TaskFlow" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-github"></i> GitHub
+      </a>
+    </div>
+  </footer>
+
+  <script>
+    let currentLang = localStorage.getItem('tf_lang') || 'tr';
+
+    const i18n = {
+      tr: {
+        themeTitle: "Temayı Değiştir",
+        btnNewTask: "Yeni İş Kalemi",
+        kpiTotal: "Aktif İş Kalemleri",
+        kpiReview: "Onay Bekleyen",
+        kpiDone: "Tamamlanan & Yayında",
+        kpiAudit: "PostgreSQL Denetim İzi",
+        tabKanban: "Kanban Panosu",
+        tabApprovals: "Onay Kuyruğu",
+        tabAudit: "Değişmez Denetim Günlüğü",
+        colBacklog: "İş Listesi",
+        colInProgress: "Devam Eden",
+        colReview: "İncelemede",
+        colDone: "Tamamlandı",
+        thId: "ID",
+        thTitle: "Görev Kalemi",
+        thAssignee: "Sorumlu Rol",
+        thPrio: "Öncelik",
+        thActions: "İşlemler",
+        btnSignOff: "Onayla",
+        btnReject: "Reddet",
+        createTitle: "Yeni İş Kalemi Oluştur",
+        lblTitle: "Görev Başlığı",
+        lblDesc: "Kapsam & Açıklama",
+        lblPrio: "Öncelik",
+        lblAssignee: "Sorumlu Rol",
+        btnCancel: "Vazgeç",
+        btnCreate: "İş Kalemini Oluştur",
+        authTitle: "Kurumsal Kimlik & Erişim",
+        authDesc: "Rol tabanlı operasyonel profil seçiniz:",
+        btnClose: "Kapat",
+        btnAdvance: "İlerle",
+        noQueue: "Tüm onay kuyrukları doğrulandı. Bekleyen görev yok!",
+        toastCreated: "İş kalemi oluşturuldu:",
+        toastApproved: "Görev onaylandı & tamamlandı:",
+        toastReturned: "Görev incelemeden geri çekildi:"
+      },
+      en: {
+        themeTitle: "Toggle Theme",
+        btnNewTask: "New Work Item",
+        kpiTotal: "Active Work Items",
+        kpiReview: "Pending Sign-Off",
+        kpiDone: "Completed & Deployed",
+        kpiAudit: "PostgreSQL Audits",
+        tabKanban: "Kanban Board",
+        tabApprovals: "Approval Queue",
+        tabAudit: "Immutable Audit Log",
+        colBacklog: "Backlog",
+        colInProgress: "In Progress",
+        colReview: "Under Review",
+        colDone: "Completed",
+        thId: "ID",
+        thTitle: "Task Item",
+        thAssignee: "Assignee Role",
+        thPrio: "Priority",
+        thActions: "Actions",
+        btnSignOff: "Sign Off",
+        btnReject: "Reject",
+        createTitle: "Create Workflow Item",
+        lblTitle: "Task Title",
+        lblDesc: "Scope & Description",
+        lblPrio: "Priority",
+        lblAssignee: "Assignee Role",
+        btnCancel: "Cancel",
+        btnCreate: "Create Item",
+        authTitle: "Enterprise Identity & Access",
+        authDesc: "Select an active role-based profile:",
+        btnClose: "Close",
+        btnAdvance: "Advance",
+        noQueue: "All approval queues verified. Zero backlog!",
+        toastCreated: "Work item created:",
+        toastApproved: "Task verified and completed:",
+        toastReturned: "Task returned to Backlog:"
+      }
+    };
+
+    const rolePresets = [
+      { trName: 'Proje Yöneticisi', trRole: 'DevOps Lead', enName: 'Project Lead', enRole: 'DevOps Lead' },
+      { trName: 'Güvenlik Denetçisi', trRole: 'Security Auditor', enName: 'Security Auditor', enRole: 'Cyber Analyst' },
+      { trName: 'Müşteri Temsilcisi', trRole: 'Client Lead', enName: 'Client Representative', enRole: 'Product Owner' },
+      { trName: 'Kullanıcı / Geliştirici', trRole: 'Platform Eng', enName: 'Platform Engineer', enRole: 'Developer' }
+    ];
+
+    let currentRoleIndex = parseInt(localStorage.getItem('tf_role_idx') || '0', 10);
+    if (isNaN(currentRoleIndex) || currentRoleIndex < 0 || currentRoleIndex > 3) currentRoleIndex = 0;
+
+    let defaultTasks = [
+      {
+        id: 101,
+        title_tr: 'Spring Security 6.2 Filtre Zinciri & JWT İyileştirmesi',
+        title_en: 'Spring Security 6.2 Filter Chain Refactor',
+        desc_tr: 'Eski WebSecurityConfigurerAdapter yerine JWT claim doğrulamalı SecurityFilterChain mimarisine geçiş.',
+        desc_en: 'Migrate deprecated WebSecurityConfigurerAdapter to SecurityFilterChain with JWT claims validation.',
+        status: 'in_progress',
+        prio: 'critical',
+        assignee_tr: 'Proje Yöneticisi',
+        assignee_en: 'Project Lead'
+      },
+      {
+        id: 102,
+        title_tr: 'PostgreSQL Bağlantı Havuzu & HikariCP İyileştirmesi',
+        title_en: 'PostgreSQL Connection Pooling Tuning',
+        desc_tr: '5.000+ eşzamanlı kiracı bağlantısı için HikariCP havuz eşiklerini optimize etme.',
+        desc_en: 'Optimize HikariCP pool thresholds for 5,000+ concurrent tenant connections.',
+        status: 'done',
+        prio: 'high',
+        assignee_tr: 'Platform Mühendisi',
+        assignee_en: 'Platform Engineer'
+      },
+      {
+        id: 103,
+        title_tr: 'Çok Kademeli Hiyerarşik Dağıtım Onay Matrisi',
+        title_en: 'Hierarchical Approval Matrix Implementation',
+        desc_tr: 'Risk seviyesi 2 üzerindeki canlı dağıtımlar için çok adımlı imza iş akışı oluşturma.',
+        desc_en: 'Define multi-step sign-off workflows for deployments exceeding risk tier 2.',
+        status: 'review',
+        prio: 'high',
+        assignee_tr: 'Güvenlik Denetçisi',
+        assignee_en: 'Security Auditor'
+      },
+      {
+        id: 104,
+        title_tr: 'Merkezi OpenTelemetry Dağıtık İzleme Entegrasyonu',
+        title_en: 'Centralized OpenTelemetry Distributed Tracing',
+        desc_tr: 'Spring Boot mikroservisleri arasında trace ve span ID enjeksiyonu ve Grafana Tempo aktarımı.',
+        desc_en: 'Inject trace/span IDs across Spring Boot microservices into Grafana Tempo.',
+        status: 'backlog',
+        prio: 'medium',
+        assignee_tr: 'Kullanıcı / Geliştirici',
+        assignee_en: 'Developer'
+      },
+      {
+        id: 105,
+        title_tr: 'Değişmez Güvenlik Denetim Tablosu Bölümleme',
+        title_en: 'Immutable Audit Log Table Partitioning',
+        desc_tr: 'Geçmiş güvenlik denetim olaylarını salt okunur kopyalarla çeyreklik bazda bölümleme.',
+        desc_en: 'Partition historical security audit events by quarter with read-only replicas.',
+        status: 'done',
+        prio: 'medium',
+        assignee_tr: 'Güvenlik Denetçisi',
+        assignee_en: 'Security Auditor'
+      },
+      {
+        id: 106,
+        title_tr: 'Üretim Docker Alpine İmajı CVE Yamalama',
+        title_en: 'Production Docker CVE Remediation',
+        desc_tr: 'Küme genelindeki Alpine temel imajlarındaki kritik güvenlik açıklarını giderme.',
+        desc_en: 'Remediate critical vulnerabilities in Alpine base images across cluster.',
+        status: 'review',
+        prio: 'critical',
+        assignee_tr: 'Güvenlik Denetçisi',
+        assignee_en: 'Security Auditor'
+      },
+      {
+        id: 107,
+        title_tr: 'Redis Dağıtık Kilit & Önbellek Senkronizasyonu',
+        title_en: 'Redis Distributed Locks & Cache Sync',
+        desc_tr: 'Yüksek hacimli mikroservis veri yarışmalarını Redisson kilit mekanizması ile engelleme.',
+        desc_en: 'Prevent race conditions across microservices using Redisson distributed lock policies.',
+        status: 'in_progress',
+        prio: 'high',
+        assignee_tr: 'Platform Mühendisi',
+        assignee_en: 'Platform Engineer'
+      },
+      {
+        id: 108,
+        title_tr: 'Kafka Olay Akışı & Tüketici Grupları Ayrıştırması',
+        title_en: 'Kafka Event Streaming & Consumer Groups',
+        desc_tr: 'Sipariş ve fatura olaylarını ayrı bölümlere dağıtarak tüketici gecikmesini sıfırlama.',
+        desc_en: 'Partition order and invoice events into isolated topics to eliminate lag.',
+        status: 'backlog',
+        prio: 'medium',
+        assignee_tr: 'Kullanıcı / Geliştirici',
+        assignee_en: 'Developer'
+      },
+      {
+        id: 109,
+        title_tr: 'Kubernetes HPA Otomatik Ölçekleme Eşikleri',
+        title_en: 'Kubernetes HPA Auto-scaling Policies',
+        desc_tr: 'CPU %75 ve bellek %80 eşiklerinde pod ölçekleme metriklerini test etme.',
+        desc_en: 'Calibrate Horizontal Pod Autoscaler metrics for peak enterprise load.',
+        status: 'done',
+        prio: 'low',
+        assignee_tr: 'Proje Yöneticisi',
+        assignee_en: 'Project Lead'
+      },
+      {
+        id: 110,
+        title_tr: 'Çok Kiracılı Veritabanı İzolasyonu & RLS Kuralları',
+        title_en: 'Multi-tenant Row Level Security (RLS)',
+        desc_tr: 'PostgreSQL Row Level Security ile kiracı veri sızıntılarını donanım seviyesinde önleme.',
+        desc_en: 'Enforce tenant data isolation via PostgreSQL native Row Level Security.',
+        status: 'backlog',
+        prio: 'high',
+        assignee_tr: 'Güvenlik Denetçisi',
+        assignee_en: 'Security Auditor'
+      }
+    ];
+
+    let tasks = JSON.parse(localStorage.getItem('tf_tasks_v2')) || defaultTasks;
+
+    let defaultAudits = [
+      { user: 'Güvenlik Denetçisi', action: 'CERTIFIED', target_tr: 'Görev #102 TAMAMLANDI olarak imzalandı', target_en: 'Task #102 Signed off as COMPLETED', time_tr: '10 dk önce', time_en: '10 mins ago' },
+      { user: 'Proje Yöneticisi', action: 'DISPATCHED', target_tr: 'Görev #101 DEVAM EDEN durumuna alındı', target_en: 'Task #101 advanced to IN_PROGRESS', time_tr: '25 dk önce', time_en: '25 mins ago' },
+      { user: 'Sistem İşçisi', action: 'REPLICATED', target_tr: 'PostgreSQL WAL replikasyonu senkronize edildi', target_en: 'PostgreSQL WAL replication synchronized', time_tr: '1 saat önce', time_en: '1 hour ago' },
+      { user: 'Platform Mühendisi', action: 'MERGED', target_tr: 'PR #482 Docker Alpine CVE yaması merge edildi', target_en: 'PR #482 Docker Alpine patch merged', time_tr: '2 saat önce', time_en: '2 hours ago' },
+      { user: 'Güvenlik Denetçisi', action: 'AUDIT_SEAL', target_tr: 'Denetim tablosu sha-256 doğrulandı', target_en: 'Audit partition integrity confirmed', time_tr: '4 saat önce', time_en: '4 hours ago' },
+      { user: 'Müşteri Temsilcisi', action: 'SIGN_OFF', target_tr: 'Görev #105 kabul kriterleri imzalandı', target_en: 'Task #105 Acceptance sign-off received', time_tr: '6 saat önce', time_en: '6 hours ago' }
+    ];
+
+    let auditLogs = JSON.parse(localStorage.getItem('tf_audits_v2')) || defaultAudits;
+
+    function toggleLanguage() {
+      currentLang = (currentLang === 'tr') ? 'en' : 'tr';
+      localStorage.setItem('tf_lang', currentLang);
+      applyLanguage(currentLang);
+    }
+
+    function applyLanguage(lang) {
+      document.documentElement.lang = lang;
+      const dict = i18n[lang] || i18n.tr;
+
+      document.getElementById('langTr').className = (lang === 'tr') ? 'active' : '';
+      document.getElementById('langEn').className = (lang === 'en') ? 'active' : '';
+
+      document.getElementById('btnTheme').title = dict.themeTitle;
+      document.getElementById('lblBtnNewTask').textContent = dict.btnNewTask;
+
+      document.getElementById('kpiLabelTotal').textContent = dict.kpiTotal;
+      document.getElementById('kpiLabelReview').textContent = dict.kpiReview;
+      document.getElementById('kpiLabelDone').textContent = dict.kpiDone;
+      document.getElementById('kpiLabelAudit').textContent = dict.kpiAudit;
+
+      document.getElementById('lblTabKanban').textContent = dict.tabKanban;
+      document.getElementById('lblTabApprovals').textContent = dict.tabApprovals;
+      document.getElementById('lblTabAudit').textContent = dict.tabAudit;
+
+      document.getElementById('colHeaderBacklog').textContent = dict.colBacklog;
+      document.getElementById('colHeaderInProgress').textContent = dict.colInProgress;
+      document.getElementById('colHeaderReview').textContent = dict.colReview;
+      document.getElementById('colHeaderDone').textContent = dict.colDone;
+
+      document.getElementById('thAppId').textContent = dict.thId;
+      document.getElementById('thAppTitle').textContent = dict.thTitle;
+      document.getElementById('thAppAssignee').textContent = dict.thAssignee;
+      document.getElementById('thAppPrio').textContent = dict.thPrio;
+      document.getElementById('thAppActions').textContent = dict.thActions;
+
+      document.getElementById('createModalTitle').textContent = dict.createTitle;
+      document.getElementById('lblTaskTitle').textContent = dict.lblTitle;
+      document.getElementById('lblTaskDesc').textContent = dict.lblDesc;
+      document.getElementById('lblTaskPrio').textContent = dict.lblPrio;
+      document.getElementById('lblTaskAssignee').textContent = dict.lblAssignee;
+      document.getElementById('btnCancelTask').textContent = dict.btnCancel;
+      document.getElementById('btnSubmitTask').textContent = dict.btnCreate;
+
+      document.getElementById('authModalTitle').textContent = dict.authTitle;
+      document.getElementById('authModalDesc').textContent = dict.authDesc;
+      document.getElementById('authBtnClose').textContent = dict.btnClose;
+
+      // Update Persona Display
+      const preset = rolePresets[currentRoleIndex];
+      document.getElementById('userNameText').textContent = `${(lang === 'tr') ? preset.trName : preset.enName} (${(lang === 'tr') ? preset.trRole : preset.enRole})`;
+
+      renderBoard();
+      renderApprovals();
+      renderAudits();
+    }
+
+    function saveState() {
+      localStorage.setItem('tf_role_idx', currentRoleIndex.toString());
+      localStorage.setItem('tf_tasks_v2', JSON.stringify(tasks));
+      localStorage.setItem('tf_audits_v2', JSON.stringify(auditLogs));
+    }
+
+    function renderBoard() {
+      const dict = i18n[currentLang] || i18n.tr;
+      const cols = ['backlog', 'in_progress', 'review', 'done'];
+
+      cols.forEach(col => {
+        const container = document.getElementById(`col-${col}`);
+        const badge = document.getElementById(`count-${col}`);
+        container.innerHTML = '';
+        const filtered = tasks.filter(t => t.status === col);
+        badge.textContent = filtered.length;
+
+        filtered.forEach(task => {
+          const title = (currentLang === 'tr') ? (task.title_tr || task.title) : (task.title_en || task.title);
+          const desc = (currentLang === 'tr') ? (task.desc_tr || task.desc) : (task.desc_en || task.desc);
+          const assignee = (currentLang === 'tr') ? (task.assignee_tr || task.assignee) : (task.assignee_en || task.assignee);
+
+          const el = document.createElement('div');
+          el.className = 'task-card';
+          el.onclick = () => advanceTask(task.id);
+          el.innerHTML = `
+            <div class="task-meta">
+              <span class="task-id">#${task.id}</span>
+              <span class="task-badge badge-${task.prio}">${task.prio}</span>
+            </div>
+            <h4 class="task-title">${title}</h4>
+            <p class="task-desc">${desc}</p>
+            <div class="task-footer">
+              <span><i class="bi bi-person"></i> ${assignee}</span>
+              <span style="color:var(--primary);"><i class="bi bi-chevron-right"></i> ${dict.btnAdvance}</span>
+            </div>
+          `;
+          container.appendChild(el);
+        });
+      });
+
+      document.getElementById('kpiTotal').textContent = tasks.length;
+      document.getElementById('kpiReview').textContent = tasks.filter(t => t.status === 'review').length;
+      document.getElementById('kpiDone').textContent = tasks.filter(t => t.status === 'done').length;
+      document.getElementById('approvalBadge').textContent = tasks.filter(t => t.status === 'review').length;
+    }
+
+    function advanceTask(id) {
+      const t = tasks.find(x => x.id === id);
+      if (!t) return;
+      const states = ['backlog', 'in_progress', 'review', 'done'];
+      const nextIdx = (states.indexOf(t.status) + 1) % states.length;
+      t.status = states[nextIdx];
+
+      const preset = rolePresets[currentRoleIndex];
+      const activeRole = (currentLang === 'tr') ? preset.trName : preset.enName;
+
+      auditLogs.unshift({
+        user: activeRole,
+        action: 'TRANSITION',
+        target_tr: `#${t.id} görevi ${t.status.toUpperCase()} durumuna taşındı`,
+        target_en: `Moved #${t.id} to ${t.status.toUpperCase()}`,
+        time_tr: 'Az önce',
+        time_en: 'Just now'
+      });
+      document.getElementById('kpiAudit').textContent = 1848 + auditLogs.length;
+
+      saveState();
+      renderBoard();
+      renderApprovals();
+      renderAudits();
+    }
+
+    function renderApprovals() {
+      const dict = i18n[currentLang] || i18n.tr;
+      const tbody = document.getElementById('approvalsTableBody');
+      tbody.innerHTML = '';
+      const pending = tasks.filter(t => t.status === 'review');
+
+      if (pending.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">${dict.noQueue}</td></tr>`;
+        return;
+      }
+
+      pending.forEach(t => {
+        const title = (currentLang === 'tr') ? (t.title_tr || t.title) : (t.title_en || t.title);
+        const desc = (currentLang === 'tr') ? (t.desc_tr || t.desc) : (t.desc_en || t.desc);
+        const assignee = (currentLang === 'tr') ? (t.assignee_tr || t.assignee) : (t.assignee_en || t.assignee);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-family:var(--font-mono);font-weight:bold;color:var(--primary);">#${t.id}</td>
+          <td><strong>${title}</strong><div style="font-size:0.8rem;color:var(--text-muted);">${desc}</div></td>
+          <td>${assignee}</td>
+          <td><span class="task-badge badge-${t.prio}">${t.prio}</span></td>
+          <td>
+            <div style="display:flex;gap:0.4rem;">
+              <button class="btn btn-primary" style="padding:0.3rem 0.65rem;font-size:0.8rem;" onclick="resolveReview(${t.id}, true)">
+                <i class="bi bi-check"></i> ${dict.btnSignOff}
+              </button>
+              <button class="btn btn-outline" style="padding:0.3rem 0.65rem;font-size:0.8rem;color:var(--danger);" onclick="resolveReview(${t.id}, false)">
+                <i class="bi bi-x"></i> ${dict.btnReject}
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function resolveReview(id, approved) {
+      const t = tasks.find(x => x.id === id);
+      if (!t) return;
+      const preset = rolePresets[currentRoleIndex];
+      const activeRole = (currentLang === 'tr') ? preset.trName : preset.enName;
+
+      if (approved) {
+        t.status = 'done';
+        auditLogs.unshift({
+          user: activeRole,
+          action: 'CERTIFIED',
+          target_tr: `#${t.id} görevi onaylandı ve yayına alındı`,
+          target_en: `Approved and verified #${t.id}`,
+          time_tr: 'Az önce',
+          time_en: 'Just now'
+        });
+      } else {
+        t.status = 'backlog';
+        auditLogs.unshift({
+          user: activeRole,
+          action: 'CHANGES_REQ',
+          target_tr: `#${t.id} görevi tekrar İş Listesine döndürüldü`,
+          target_en: `Returned #${t.id} to Backlog`,
+          time_tr: 'Az önce',
+          time_en: 'Just now'
+        });
+      }
+      document.getElementById('kpiAudit').textContent = 1848 + auditLogs.length;
+
+      saveState();
+      renderBoard();
+      renderApprovals();
+      renderAudits();
+    }
+
+    function renderAudits() {
+      const list = document.getElementById('auditList');
+      list.innerHTML = '';
+      auditLogs.slice(0, 10).forEach(a => {
+        const target = (currentLang === 'tr') ? (a.target_tr || a.target) : (a.target_en || a.target);
+        const time = (currentLang === 'tr') ? (a.time_tr || a.time) : (a.time_en || a.time);
+
+        const div = document.createElement('div');
+        div.className = 'audit-item';
+        div.innerHTML = `
+          <div>
+            <strong>[${a.user}]</strong> &bull; <span style="color:var(--primary);font-weight:bold;">${a.action}</span> &bull; <span>${target}</span>
+          </div>
+          <span style="font-size:0.78rem;color:var(--text-muted);">${time}</span>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function setTab(tab, btn) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${tab}`).style.display = 'block';
+      btn.classList.add('active');
+    }
+
+    function openNewTaskModal() { document.getElementById('newTaskModal').classList.add('active'); }
+    function closeNewTaskModal() { document.getElementById('newTaskModal').classList.remove('active'); }
+    function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+
+    function handleCreateTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('taskTitleInput').value;
+      const desc = document.getElementById('taskDescInput').value;
+      const prio = document.getElementById('taskPrioInput').value;
+      const assignee = document.getElementById('taskAssigneeInput').value || 'Proje Yöneticisi';
+
+      const newId = 100 + tasks.length + 1;
+      tasks.push({
+        id: newId,
+        title_tr: title,
+        title_en: title,
+        desc_tr: desc,
+        desc_en: desc,
+        prio,
+        assignee_tr: assignee,
+        assignee_en: assignee,
+        status: 'backlog'
+      });
+
+      const preset = rolePresets[currentRoleIndex];
+      const activeRole = (currentLang === 'tr') ? preset.trName : preset.enName;
+
+      auditLogs.unshift({
+        user: activeRole,
+        action: 'CREATED',
+        target_tr: `#${newId} iş kalemi oluşturuldu: ${title}`,
+        target_en: `Created work item #${newId}: ${title}`,
+        time_tr: 'Az önce',
+        time_en: 'Just now'
+      });
+      document.getElementById('kpiAudit').textContent = 1848 + auditLogs.length;
+
+      saveState();
+      closeNewTaskModal();
+      document.getElementById('taskForm').reset();
+      renderBoard();
+      renderAudits();
+    }
+
+    function setRoleByPreset(idx) {
+      currentRoleIndex = idx;
+      const preset = rolePresets[idx];
+      const name = (currentLang === 'tr') ? preset.trName : preset.enName;
+      const role = (currentLang === 'tr') ? preset.trRole : preset.enRole;
+      document.getElementById('userNameText').textContent = `${name} (${role})`;
+
+      auditLogs.unshift({
+        user: 'Identity Kernel',
+        action: 'SIGN_IN',
+        target_tr: `${name} (${role}) olarak kimlik doğrulandı`,
+        target_en: `Authenticated as ${name} (${role})`,
+        time_tr: 'Az önce',
+        time_en: 'Just now'
+      });
+
+      saveState();
+      closeAuthModal();
+      renderAudits();
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      document.getElementById('themeIcon').className = next === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun';
+      localStorage.setItem('tf_theme', next);
+    }
+
+    // Init Theme & User
+    const savedTheme = localStorage.getItem('tf_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.getElementById('themeIcon').className = savedTheme === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun';
+
+    // Initialize with Turkish default
+    applyLanguage(currentLang);
+    saveState();
+  </script>
+</body>
+</html>
