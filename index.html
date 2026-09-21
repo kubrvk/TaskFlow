@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="tr" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TaskFlow Enterprise — Personnel &amp; Task Orchestration</title>
-  <meta name="description" content="TaskFlow: Enterprise task orchestration, hierarchical approvals, and immutable audit logs. Developed by Beraat Yetkin.">
+  <title>TaskFlow Enterprise — Çevik Görev &amp; Onay Yönetimi</title>
+  <meta name="description" content="TaskFlow: Çevik sprint panosu, hiyerarşik onay mekanizması, görev silme ve PostgreSQL değişmez denetim izi. Developed by Beraat Yetkin.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%232563eb'/%3E%3Cpath d='M9 10h14M9 16h10M9 22h14' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='23' cy='16' r='2' fill='%2338bdf8'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <style>
     :root {
@@ -29,20 +29,7 @@
       --font-mono: 'JetBrains Mono', monospace;
       --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.07);
-    }
-    [data-theme="dark"] {
-      --bg: #090d16;
-      --surface: #0f1523;
-      --card: #151d30;
-      --border: #1e293b;
-      --border-strong: #334155;
-      --primary: #3b82f6;
-      --primary-hover: #60a5fa;
-      --primary-subtle: rgba(59, 130, 246, 0.15);
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-      --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+      --shadow-lg: 0 10px 25px -3px rgba(0,0,0,0.12);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -52,30 +39,48 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      font-size: 15px;
+      font-size: 14.5px;
       line-height: 1.5;
-      transition: background-color 0.2s, color 0.2s;
     }
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0.85rem 2rem;
+
+    /* Agile Shell: Left Dock + Main Workspace */
+    .agile-shell {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      min-height: 100vh;
+      width: 100%;
+    }
+    .agile-dock {
+      width: 250px;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
       position: sticky;
       top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow-sm);
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 90;
+      border-right: 1px solid #1e293b;
+      padding: 1.25rem 0.85rem;
     }
+    @media (max-width: 960px) {
+      .agile-shell { flex-direction: column; }
+      .agile-dock { width: 100%; height: auto; position: static; }
+    }
+
     .brand {
       display: flex;
       align-items: center;
       gap: 0.75rem;
       font-weight: 800;
-      font-size: 1.25rem;
-      letter-spacing: -0.5px;
-      color: var(--text);
+      font-size: 1.2rem;
+      letter-spacing: -0.4px;
+      color: #fff;
+      text-decoration: none;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 1rem;
     }
     .brand-icon {
       width: 34px;
@@ -88,16 +93,119 @@
       justify-content: center;
       font-size: 1.1rem;
     }
-    .header-right {
+
+    /* Sprint Velocity Card */
+    .sprint-dock-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .sprint-progress-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: 0.4rem 0;
+    }
+    .sprint-progress-fill {
+      height: 100%;
+      background: #38bdf8;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+
+    /* Dock Nav Items */
+    .dock-nav-item {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      color: #94a3b8;
+      background: transparent;
+      border: 1px solid transparent;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s;
+      margin-bottom: 0.3rem;
     }
+    .dock-nav-item:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.06);
+    }
+    .dock-nav-item.active {
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    }
+    .dock-nav-item i {
+      margin-right: 0.5rem;
+    }
+    .dock-badge {
+      font-size: 0.75rem;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    /* Main Workspace Column */
+    .agile-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+
+    /* Sticky Sprint Ribbon */
+    .sprint-ribbon {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Telemetry KPI Ribbon */
+    .agile-kpi-bar {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 1rem;
+      font-size: 0.82rem;
+    }
+    .agile-kpi {
+      display: flex;
+      flex-direction: column;
+    }
+    .agile-kpi-val {
+      font-size: 1.35rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      line-height: 1.2;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.95rem;
       border-radius: 6px;
       font-weight: 600;
       font-size: 0.88rem;
@@ -105,33 +213,20 @@
       border: 1px solid transparent;
       transition: all 0.15s ease;
       text-decoration: none;
+      font-family: inherit;
     }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-hover); }
-    .btn-outline { background: var(--surface); border-color: var(--border); color: var(--text); }
-    .btn-outline:hover { background: var(--border); }
-    .btn-theme { padding: 0.5rem 0.75rem; color: var(--text-muted); }
-
-    .user-pill {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.35rem 0.75rem;
-      background: var(--primary-subtle);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--primary);
-      cursor: pointer;
-    }
+    .btn-outline { background: #fff; border-color: var(--border-strong); color: var(--text); }
+    .btn-outline:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
 
     .lang-toggle {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
       background: var(--primary-subtle);
-      border: 1px solid var(--border);
+      border: 1px solid #bfdbfe;
       border-radius: 6px;
       padding: 0.3rem 0.6rem;
       font-size: 0.82rem;
@@ -141,68 +236,27 @@
       user-select: none;
       transition: all 0.15s ease;
     }
-    .lang-toggle:hover { background: var(--border); }
+    .lang-toggle:hover { background: #dbeafe; }
     .lang-toggle span.active { color: var(--primary); font-weight: 800; }
 
     main {
       flex: 1;
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 1.75rem 2rem;
+      padding: 1.5rem 2rem;
       width: 100%;
     }
-
-    /* KPI Cards */
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 1.75rem;
-    }
-    .kpi-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.25rem;
-      box-shadow: var(--shadow-sm);
-    }
-    .kpi-label { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-    .kpi-value { font-size: 1.75rem; font-weight: 800; margin: 0.25rem 0; font-family: var(--font-mono); }
-
-    /* Navigation Tabs */
-    .nav-tabs {
-      display: flex;
-      gap: 0.5rem;
-      border-bottom: 1px solid var(--border);
-      margin-bottom: 1.5rem;
-    }
-    .tab-btn {
-      padding: 0.65rem 1.25rem;
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
 
     /* Kanban Board */
     .kanban-board {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 1.25rem;
       align-items: flex-start;
     }
     .kanban-col {
-      background: var(--surface);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 1.1rem;
+      padding: 1rem;
       min-height: 520px;
       box-shadow: var(--shadow-sm);
     }
@@ -214,10 +268,10 @@
       padding-bottom: 0.65rem;
       border-bottom: 1px solid var(--border);
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     .col-count {
-      background: var(--bg);
+      background: #f1f5f9;
       border: 1px solid var(--border);
       font-size: 0.75rem;
       padding: 2px 7px;
@@ -232,13 +286,12 @@
       gap: 0.85rem;
     }
     .task-card {
-      background: var(--card);
+      background: #ffffff;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 1rem;
-      box-shadow: var(--shadow-sm);
-      cursor: pointer;
-      transition: all 0.2s ease;
+      padding: 0.9rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: all 0.15s ease;
       position: relative;
     }
     .task-card:hover {
@@ -261,12 +314,12 @@
       border-radius: 4px;
       text-transform: uppercase;
     }
-    .badge-critical { background: #fee2e2; color: #b91c1c; }
-    .badge-high { background: #fef3c7; color: #b45309; }
-    .badge-medium { background: #e0f2fe; color: #0369a1; }
-    .badge-low { background: #dcfce7; color: #15803d; }
-    .task-title { font-size: 0.98rem; font-weight: 600; margin-bottom: 0.35rem; color: var(--text); }
-    .task-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.45; }
+    .badge-critical { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .badge-high { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+    .badge-medium { background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+    .badge-low { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .task-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text); }
+    .task-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.45; }
     .task-footer {
       display: flex;
       justify-content: space-between;
@@ -287,8 +340,8 @@
     }
     table { width: 100%; border-collapse: collapse; text-align: left; }
     th {
-      background: var(--bg);
-      padding: 0.9rem 1.2rem;
+      background: #f8fafc;
+      padding: 0.85rem 1.1rem;
       font-size: 0.8rem;
       font-weight: 700;
       color: var(--text-muted);
@@ -296,12 +349,13 @@
       border-bottom: 1px solid var(--border);
     }
     td {
-      padding: 1rem 1.2rem;
+      padding: 0.95rem 1.1rem;
       border-bottom: 1px solid var(--border);
-      font-size: 0.92rem;
+      font-size: 0.9rem;
+      vertical-align: middle;
     }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: var(--primary-subtle); }
+    tr:hover td { background: #f8fafc; }
 
     /* Audit Stream */
     .audit-list { display: flex; flex-direction: column; gap: 0.65rem; }
@@ -314,7 +368,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       font-family: var(--font-mono);
       box-shadow: var(--shadow-sm);
     }
@@ -338,26 +392,28 @@
       border-radius: 12px;
       width: 100%;
       max-width: 480px;
-      padding: 2rem;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-lg);
     }
-    .modal-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 1.25rem; }
     .form-group { margin-bottom: 1rem; }
-    .form-label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .form-label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
     .form-control {
       width: 100%;
-      background: var(--bg);
+      background: #fff;
       border: 1px solid var(--border-strong);
       border-radius: 6px;
-      padding: 0.65rem 0.85rem;
-      font-size: 0.95rem;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
       color: var(--text);
+      outline: none;
+      font-family: inherit;
     }
-    .form-control:focus { outline: none; border-color: var(--primary); }
+    .form-control:focus { border-color: var(--primary); }
 
     /* Footer */
     footer {
-      background: var(--surface);
+      background: #ffffff;
       border-top: 1px solid var(--border);
       padding: 1.25rem 2rem;
       display: flex;
@@ -365,18 +421,40 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 1rem;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
+      margin-top: auto;
     }
-    footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    footer a { color: var(--primary); text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 0.35rem; }
     footer a:hover { text-decoration: underline; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0f172a;
+      color: #fff;
+      padding: 0.85rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      z-index: 2000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
 
     /* Fullscreen Login Portal */
     .login-overlay {
       position: fixed;
       inset: 0;
       z-index: 10000;
-      background: linear-gradient(135deg, #090d16 0%, #1e3a8a 100%);
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -469,7 +547,6 @@
   <!-- Fullscreen Login Portal (Initial Gate) -->
   <div class="login-overlay" id="loginPortal">
     <div class="login-box">
-      <!-- Top header with Lang toggle -->
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
         <div style="display:flex;align-items:center;gap:0.65rem;">
           <div class="brand-icon" style="width:36px;height:36px;font-size:1.15rem;"><i class="bi bi-kanban"></i></div>
@@ -538,128 +615,185 @@
     </div>
   </div>
 
-  <header>
-    <div class="brand">
-      <div class="brand-icon"><i class="bi bi-kanban"></i></div>
-      <span>TaskFlow<span style="color:var(--primary)">.Enterprise</span></span>
-    </div>
-
-    <div class="header-right">
-      <div class="lang-toggle" onclick="toggleLanguage()">
-        <span id="langTr" class="active">TR</span>
-        <span style="opacity:0.4;">|</span>
-        <span id="langEn">EN</span>
-      </div>
-
-      <button class="btn btn-outline btn-theme" onclick="toggleTheme()" title="Temayı Değiştir" id="btnTheme">
-        <i class="bi bi-moon-stars" id="themeIcon"></i>
-      </button>
-
-      <div class="user-pill" id="userPill" onclick="openAuthModal()">
-        <i class="bi bi-person-circle"></i>
-        <span id="userNameText">Proje Yöneticisi</span>
-      </div>
-
-      <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:#fca5a5;" onclick="logoutUser()" title="Çıkış Yap">
-        <i class="bi bi-box-arrow-right"></i> <span id="lblLogout">Çıkış</span>
-      </button>
-
-      <button class="btn btn-primary" onclick="openNewTaskModal()" id="btnNewTask">
-        <i class="bi bi-plus-lg"></i> <span id="lblBtnNewTask">Yeni İş Kalemi</span>
-      </button>
-
-      <a href="https://github.com/kubrvk/TaskFlow" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-        <i class="bi bi-github"></i> GitHub
+  <div class="agile-shell">
+    <!-- Agile Left Dock -->
+    <aside class="agile-dock">
+      <a href="index.html" class="brand">
+        <div class="brand-icon"><i class="bi bi-kanban"></i></div>
+        <div>
+          <span>TaskFlow<span style="color:#60a5fa">.Ops</span></span>
+          <span style="font-size:0.7rem;color:#94a3b8;display:block;">Çevik Sprint Panosu</span>
+        </div>
       </a>
-    </div>
-  </header>
 
-  <main>
-    <div class="kpi-row">
-      <div class="kpi-card">
-        <div class="kpi-label" id="kpiLabelTotal">Aktif İş Kalemleri</div>
-        <div class="kpi-value" id="kpiTotal" style="color:var(--primary);">10</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label" id="kpiLabelReview">Onay Bekleyen</div>
-        <div class="kpi-value" id="kpiReview" style="color:var(--warning);">2</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label" id="kpiLabelDone">Tamamlanan &amp; Yayında</div>
-        <div class="kpi-value" id="kpiDone" style="color:var(--accent);">3</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label" id="kpiLabelAudit">PostgreSQL Denetim İzi</div>
-        <div class="kpi-value" id="kpiAudit">1,848</div>
-      </div>
-    </div>
-
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="setTab('kanban', this)" id="tabBtnKanban"><i class="bi bi-columns-gap"></i> <span id="lblTabKanban">Kanban Panosu</span></button>
-      <button class="tab-btn" onclick="setTab('approvals', this)" id="tabBtnApprovals"><i class="bi bi-check2-circle"></i> <span id="lblTabApprovals">Onay Kuyruğu</span> (<span id="approvalBadge">2</span>)</button>
-      <button class="tab-btn" onclick="setTab('audit', this)" id="tabBtnAudit"><i class="bi bi-journal-code"></i> <span id="lblTabAudit">Değişmez Denetim Günlüğü</span></button>
-    </div>
-
-    <!-- TAB 1: KANBAN -->
-    <div id="tab-kanban" class="tab-pane">
-      <div class="kanban-board">
-        <div class="kanban-col">
-          <div class="col-header">
-            <span><i class="bi bi-inbox"></i> <span id="colHeaderBacklog">İş Listesi</span></span>
-            <span class="col-count" id="count-backlog">0</span>
-          </div>
-          <div class="task-list" id="col-backlog"></div>
+      <!-- Sprint Velocity Widget -->
+      <div class="sprint-dock-card">
+        <div style="display:flex;justify-content:space-between;font-size:0.75rem;color:#94a3b8;margin-bottom:0.25rem;">
+          <span style="font-weight:700;color:#fff;">Sprint #42 (2026/Q3)</span>
+          <span id="sprintPercentText" style="font-family:var(--font-mono);color:#38bdf8;font-weight:700;">60%</span>
         </div>
-
-        <div class="kanban-col">
-          <div class="col-header" style="color:var(--primary);">
-            <span><i class="bi bi-arrow-repeat"></i> <span id="colHeaderInProgress">Devam Eden</span></span>
-            <span class="col-count" id="count-in_progress">0</span>
-          </div>
-          <div class="task-list" id="col-in_progress"></div>
+        <div class="sprint-progress-bar">
+          <div class="sprint-progress-fill" id="sprintFill" style="width: 60%;"></div>
         </div>
-
-        <div class="kanban-col">
-          <div class="col-header" style="color:var(--warning);">
-            <span><i class="bi bi-shield-lock"></i> <span id="colHeaderReview">İncelemede</span></span>
-            <span class="col-count" id="count-review">0</span>
-          </div>
-          <div class="task-list" id="col-review"></div>
-        </div>
-
-        <div class="kanban-col">
-          <div class="col-header" style="color:var(--accent);">
-            <span><i class="bi bi-check-circle-fill"></i> <span id="colHeaderDone">Tamamlandı</span></span>
-            <span class="col-count" id="count-done">0</span>
-          </div>
-          <div class="task-list" id="col-done"></div>
+        <div style="font-size:0.72rem;color:#94a3b8;display:flex;justify-content:space-between;margin-top:0.35rem;">
+          <span id="sprintDoneCountText">6 Tamamlandı</span>
+          <span id="sprintTotalCountText">10 Görev</span>
         </div>
       </div>
-    </div>
 
-    <!-- TAB 2: APPROVALS -->
-    <div id="tab-approvals" class="tab-pane" style="display:none;">
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th id="thAppId">ID</th>
-              <th id="thAppTitle">Görev Kalemi</th>
-              <th id="thAppAssignee">Sorumlu Rol</th>
-              <th id="thAppPrio">Öncelik</th>
-              <th id="thAppActions">İşlemler</th>
-            </tr>
-          </thead>
-          <tbody id="approvalsTableBody"></tbody>
-        </table>
+      <!-- Navigation Tabs -->
+      <div style="display:flex;flex-direction:column;flex:1;">
+        <button class="dock-nav-item active" onclick="setTab('kanban', this)" id="tabBtnKanban">
+          <span><i class="bi bi-columns-gap"></i> <span id="lblTabKanban">Kanban Panosu</span></span>
+          <span class="dock-badge" id="badgeKanbanCount">10</span>
+        </button>
+        <button class="dock-nav-item" onclick="setTab('approvals', this)" id="tabBtnApprovals">
+          <span><i class="bi bi-check2-circle"></i> <span id="lblTabApprovals">Onay Kuyruğu</span></span>
+          <span class="dock-badge" id="approvalBadge" style="background:#f59e0b;color:#000;">2</span>
+        </button>
+        <button class="dock-nav-item" onclick="setTab('audit', this)" id="tabBtnAudit">
+          <span><i class="bi bi-journal-code"></i> <span id="lblTabAudit">Denetim İzi</span></span>
+        </button>
       </div>
-    </div>
 
-    <!-- TAB 3: AUDIT -->
-    <div id="tab-audit" class="tab-pane" style="display:none;">
-      <div class="audit-list" id="auditList"></div>
-    </div>
-  </main>
+      <div style="margin-top:auto;padding-top:1rem;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;align-items:center;gap:0.55rem;font-size:0.84rem;margin-bottom:0.75rem;">
+          <i class="bi bi-person-circle" style="font-size:1.3rem;color:#60a5fa;"></i>
+          <div style="overflow:hidden;">
+            <div id="userNameText" style="font-weight:700;white-space:nowrap;text-overflow:ellipsis;font-size:0.84rem;color:#fff;">Proje Yöneticisi</div>
+            <div style="font-size:0.72rem;color:#94a3b8;">DevOps Lead</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:0.4rem;">
+          <button class="btn btn-outline btn-sm" style="flex:1;background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#fff;font-size:0.78rem;" onclick="openAuthModal()">
+            <i class="bi bi-person-gear"></i> <span id="lblSwitchRole">Rol</span>
+          </button>
+          <button class="btn btn-outline btn-sm" style="background:rgba(239,68,68,0.15);border-color:rgba(239,68,68,0.3);color:#fca5a5;font-size:0.78rem;" onclick="logoutUser()">
+            <i class="bi bi-box-arrow-right"></i> <span id="lblLogout">Çıkış</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <div class="agile-main">
+      <!-- Sprint Top Ribbon -->
+      <header class="sprint-ribbon">
+        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <span style="font-weight:800;font-size:1.05rem;color:#0f172a;display:flex;align-items:center;gap:0.4rem;">
+            <i class="bi bi-lightning-charge-fill text-primary"></i> <span id="lblSprintTitle">Sprint 42: Production Scale &amp; Zero Trust</span>
+          </span>
+          <span style="background:#f1f5f9;border:1px solid #cbd5e1;padding:0.25rem 0.65rem;border-radius:999px;font-size:0.78rem;font-weight:600;color:#475569;">
+            Hedef: 2026/Q3
+          </span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="lang-toggle" onclick="toggleLanguage()">
+            <span id="langTr" class="active">TR</span>
+            <span style="opacity:0.4;">|</span>
+            <span id="langEn">EN</span>
+          </div>
+
+          <button class="btn btn-primary" onclick="openNewTaskModal()" id="btnNewTask">
+            <i class="bi bi-plus-lg"></i> <span id="lblBtnNewTask">Yeni İş Kalemi</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Agile Telemetry KPI Ribbon -->
+      <div class="agile-kpi-bar">
+        <div class="agile-kpi">
+          <span style="color:var(--text-muted);font-weight:600;" id="kpiLabelTotal">Toplam İş Kalemleri</span>
+          <strong class="agile-kpi-val" style="color:var(--primary);" id="kpiTotal">10</strong>
+        </div>
+        <div class="agile-kpi">
+          <span style="color:var(--text-muted);font-weight:600;" id="kpiLabelReview">Onay Bekleyen</span>
+          <strong class="agile-kpi-val" style="color:var(--warning);" id="kpiReview">2</strong>
+        </div>
+        <div class="agile-kpi">
+          <span style="color:var(--text-muted);font-weight:600;" id="kpiLabelDone">Tamamlanan</span>
+          <strong class="agile-kpi-val" style="color:var(--accent);" id="kpiDone">3</strong>
+        </div>
+        <div class="agile-kpi">
+          <span style="color:var(--text-muted);font-weight:600;" id="kpiLabelAudit">PostgreSQL Denetim İzi</span>
+          <strong class="agile-kpi-val" style="color:#0f172a;" id="kpiAudit">1,848</strong>
+        </div>
+      </div>
+
+      <main>
+        <!-- TAB 1: KANBAN -->
+        <div id="tab-kanban" class="tab-pane">
+          <div class="kanban-board">
+            <div class="kanban-col">
+              <div class="col-header">
+                <span><i class="bi bi-inbox"></i> <span id="colHeaderBacklog">İş Listesi</span></span>
+                <span class="col-count" id="count-backlog">0</span>
+              </div>
+              <div class="task-list" id="col-backlog"></div>
+            </div>
+
+            <div class="kanban-col">
+              <div class="col-header" style="color:var(--primary);">
+                <span><i class="bi bi-arrow-repeat"></i> <span id="colHeaderInProgress">Devam Eden</span></span>
+                <span class="col-count" id="count-in_progress">0</span>
+              </div>
+              <div class="task-list" id="col-in_progress"></div>
+            </div>
+
+            <div class="kanban-col">
+              <div class="col-header" style="color:var(--warning);">
+                <span><i class="bi bi-shield-lock"></i> <span id="colHeaderReview">İncelemede</span></span>
+                <span class="col-count" id="count-review">0</span>
+              </div>
+              <div class="task-list" id="col-review"></div>
+            </div>
+
+            <div class="kanban-col">
+              <div class="col-header" style="color:var(--accent);">
+                <span><i class="bi bi-check-circle-fill"></i> <span id="colHeaderDone">Tamamlandı</span></span>
+                <span class="col-count" id="count-done">0</span>
+              </div>
+              <div class="task-list" id="col-done"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: APPROVALS -->
+        <div id="tab-approvals" class="tab-pane" style="display:none;">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th id="thAppId">ID</th>
+                  <th id="thAppTitle">Görev Kalemi</th>
+                  <th id="thAppAssignee">Sorumlu Rol</th>
+                  <th id="thAppPrio">Öncelik</th>
+                  <th style="text-align:right;" id="thAppActions">İşlemler</th>
+                </tr>
+              </thead>
+              <tbody id="approvalsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB 3: AUDIT -->
+        <div id="tab-audit" class="tab-pane" style="display:none;">
+          <div class="audit-list" id="auditList"></div>
+        </div>
+      </main>
+
+      <!-- Strict Standard Footer -->
+      <footer>
+        <div>Developed by Beraat Yetkin</div>
+        <div>
+          <a href="https://github.com/kubrvk/TaskFlow" target="_blank" rel="noopener noreferrer">
+            <i class="bi bi-github"></i> GitHub
+          </a>
+        </div>
+      </footer>
+    </div><!-- /.agile-main -->
+  </div><!-- /.agile-shell -->
 
   <!-- Create Task Modal -->
   <div class="modal-backdrop" id="newTaskModal">
@@ -697,6 +831,27 @@
     </div>
   </div>
 
+  <!-- Delete Task Confirmation Modal -->
+  <div class="modal-backdrop" id="deleteTaskModal">
+    <div class="modal-box" style="max-width:440px;">
+      <h3 class="modal-title" style="color:var(--danger);display:flex;align-items:center;gap:0.5rem;" id="deleteModalTitle">
+        <i class="bi bi-exclamation-triangle-fill"></i> Görevi Sil
+      </h3>
+      <p style="font-size:0.9rem;color:#475569;" id="deleteModalDesc">
+        Bu iş kalemini sprint panosundan kalıcı olarak silmek istediğinize emin misiniz? Değişmez denetim izine silme kaydı işlenecektir.
+      </p>
+      <div style="background:#fef2f2;border:1px solid #fecaca;padding:0.75rem;border-radius:8px;font-size:0.84rem;color:#991b1b;margin:1rem 0;" id="deleteTaskTargetInfo">
+        #101 - Görev Başlığı
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:0.75rem;">
+        <button type="button" class="btn btn-outline" onclick="closeDeleteTaskModal()" id="btnCancelDeleteTask">Vazgeç</button>
+        <button type="button" class="btn btn-primary" style="background:var(--danger);border-color:var(--danger);" onclick="executeDeleteTask()" id="btnConfirmDeleteTask">
+          <i class="bi bi-trash3-fill"></i> Görevi Sil
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- User Login / Register Modal -->
   <div class="modal-backdrop" id="authModal">
     <div class="modal-box">
@@ -724,30 +879,25 @@
     </div>
   </div>
 
-  <!-- Strict Standard Footer -->
-  <footer>
-    <div>Developed by Beraat Yetkin</div>
-    <div>
-      <a href="https://github.com/kubrvk/TaskFlow" target="_blank" rel="noopener noreferrer">
-        <i class="bi bi-github"></i> GitHub
-      </a>
-    </div>
-  </footer>
+  <!-- Toast Message -->
+  <div class="toast" id="toastMsg">
+    <i class="bi bi-check-circle-fill" style="color:#38bdf8;"></i>
+    <span id="toastText">İşlem başarılı.</span>
+  </div>
 
   <script>
     let currentLang = localStorage.getItem('tf_lang') || 'tr';
 
     const i18n = {
       tr: {
-        themeTitle: "Temayı Değiştir",
         btnNewTask: "Yeni İş Kalemi",
-        kpiTotal: "Aktif İş Kalemleri",
+        kpiTotal: "Toplam İş Kalemleri",
         kpiReview: "Onay Bekleyen",
-        kpiDone: "Tamamlanan & Yayında",
+        kpiDone: "Tamamlanan",
         kpiAudit: "PostgreSQL Denetim İzi",
         tabKanban: "Kanban Panosu",
         tabApprovals: "Onay Kuyruğu",
-        tabAudit: "Değişmez Denetim Günlüğü",
+        tabAudit: "Denetim İzi",
         colBacklog: "İş Listesi",
         colInProgress: "Devam Eden",
         colReview: "İncelemede",
@@ -770,10 +920,15 @@
         authDesc: "Rol tabanlı operasyonel profil seçiniz:",
         btnClose: "Kapat",
         btnAdvance: "İlerle",
+        deleteModalTitle: "Görevi Sil",
+        deleteModalDesc: "Bu iş kalemini sprint panosundan kalıcı olarak silmek istediğinize emin misiniz? Değişmez denetim izine silme kaydı işlenecektir.",
+        btnCancelDeleteTask: "Vazgeç",
+        btnConfirmDeleteTask: "Görevi Sil",
         noQueue: "Tüm onay kuyrukları doğrulandı. Bekleyen görev yok!",
         toastCreated: "İş kalemi oluşturuldu:",
         toastApproved: "Görev onaylandı & tamamlandı:",
         toastReturned: "Görev incelemeden geri çekildi:",
+        toastDeleted: "Görev kalemi başarıyla silindi.",
         loginSubtitle: "Kurumsal Görev & Onay Yönetimi Giriş Portalı",
         loginUser: "Kurumsal E-posta / Personel ID",
         loginPass: "Sistem Erişim Şifresi",
@@ -787,15 +942,14 @@
         logout: "Çıkış"
       },
       en: {
-        themeTitle: "Toggle Theme",
         btnNewTask: "New Work Item",
-        kpiTotal: "Active Work Items",
+        kpiTotal: "Total Work Items",
         kpiReview: "Pending Sign-Off",
-        kpiDone: "Completed & Deployed",
+        kpiDone: "Completed",
         kpiAudit: "PostgreSQL Audits",
         tabKanban: "Kanban Board",
         tabApprovals: "Approval Queue",
-        tabAudit: "Immutable Audit Log",
+        tabAudit: "Audit Trail",
         colBacklog: "Backlog",
         colInProgress: "In Progress",
         colReview: "Under Review",
@@ -818,10 +972,15 @@
         authDesc: "Select an active role-based profile:",
         btnClose: "Close",
         btnAdvance: "Advance",
+        deleteModalTitle: "Delete Task Item",
+        deleteModalDesc: "Are you sure you want to permanently delete this work item from the sprint board? An immutable audit event will be recorded.",
+        btnCancelDeleteTask: "Cancel",
+        btnConfirmDeleteTask: "Delete Task",
         noQueue: "All approval queues verified. Zero backlog!",
         toastCreated: "Work item created:",
         toastApproved: "Task verified and completed:",
         toastReturned: "Task returned to Backlog:",
+        toastDeleted: "Work item deleted successfully.",
         loginSubtitle: "Enterprise Task & Orchestration Sign In",
         loginUser: "Corporate Email / Personnel ID",
         loginPass: "System Access Password",
@@ -972,6 +1131,13 @@
 
     let auditLogs = JSON.parse(localStorage.getItem('tf_audits_v2')) || defaultAudits;
 
+    function showToast(text) {
+      const toast = document.getElementById('toastMsg');
+      document.getElementById('toastText').textContent = text;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
     function toggleLanguage() {
       currentLang = (currentLang === 'tr') ? 'en' : 'tr';
       localStorage.setItem('tf_lang', currentLang);
@@ -985,7 +1151,6 @@
       document.getElementById('langTr').className = (lang === 'tr') ? 'active' : '';
       document.getElementById('langEn').className = (lang === 'en') ? 'active' : '';
 
-      document.getElementById('btnTheme').title = dict.themeTitle;
       document.getElementById('lblBtnNewTask').textContent = dict.btnNewTask;
 
       document.getElementById('kpiLabelTotal').textContent = dict.kpiTotal;
@@ -1016,6 +1181,11 @@
       document.getElementById('btnCancelTask').textContent = dict.btnCancel;
       document.getElementById('btnSubmitTask').textContent = dict.btnCreate;
 
+      document.getElementById('deleteModalTitle').innerHTML = `<i class="bi bi-exclamation-triangle-fill"></i> ${dict.deleteModalTitle}`;
+      document.getElementById('deleteModalDesc').textContent = dict.deleteModalDesc;
+      document.getElementById('btnCancelDeleteTask').textContent = dict.btnCancelDeleteTask;
+      document.getElementById('btnConfirmDeleteTask').innerHTML = `<i class="bi bi-trash3-fill"></i> ${dict.btnConfirmDeleteTask}`;
+
       document.getElementById('authModalTitle').textContent = dict.authTitle;
       document.getElementById('authModalDesc').textContent = dict.authDesc;
       document.getElementById('authBtnClose').textContent = dict.btnClose;
@@ -1039,7 +1209,7 @@
 
       // Update Persona Display
       const preset = rolePresets[currentRoleIndex];
-      document.getElementById('userNameText').textContent = `${(lang === 'tr') ? preset.trName : preset.enName} (${(lang === 'tr') ? preset.trRole : preset.enRole})`;
+      document.getElementById('userNameText').textContent = `${(lang === 'tr') ? preset.trName : preset.enName}`;
 
       renderBoard();
       renderApprovals();
@@ -1050,6 +1220,26 @@
       localStorage.setItem('tf_role_idx', currentRoleIndex.toString());
       localStorage.setItem('tf_tasks_v2', JSON.stringify(tasks));
       localStorage.setItem('tf_audits_v2', JSON.stringify(auditLogs));
+      updateSprintVelocity();
+    }
+
+    function updateSprintVelocity() {
+      const total = tasks.length;
+      const done = tasks.filter(t => t.status === 'done').length;
+      const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+
+      const fillEl = document.getElementById('sprintFill');
+      const pctEl = document.getElementById('sprintPercentText');
+      const doneEl = document.getElementById('sprintDoneCountText');
+      const totalEl = document.getElementById('sprintTotalCountText');
+
+      if (fillEl) fillEl.style.width = `${pct}%`;
+      if (pctEl) pctEl.textContent = `${pct}%`;
+      if (doneEl) doneEl.textContent = `${done} ${currentLang === 'tr' ? 'Tamamlandı' : 'Completed'}`;
+      if (totalEl) totalEl.textContent = `${total} ${currentLang === 'tr' ? 'Görev' : 'Tasks'}`;
+
+      const bTotal = document.getElementById('badgeKanbanCount');
+      if (bTotal) bTotal.textContent = total;
     }
 
     function renderBoard() {
@@ -1070,17 +1260,23 @@
 
           const el = document.createElement('div');
           el.className = 'task-card';
-          el.onclick = () => advanceTask(task.id);
           el.innerHTML = `
             <div class="task-meta">
               <span class="task-id">#${task.id}</span>
-              <span class="task-badge badge-${task.prio}">${task.prio}</span>
+              <div style="display:flex;align-items:center;gap:0.35rem;">
+                <span class="task-badge badge-${task.prio}">${task.prio}</span>
+                <button type="button" class="btn btn-outline btn-sm" style="padding:1px 5px;color:var(--danger);border-color:#fca5a5;" onclick="promptDeleteTask(${task.id}, event)" title="${dict.deleteModalTitle}">
+                  <i class="bi bi-trash3"></i>
+                </button>
+              </div>
             </div>
             <h4 class="task-title">${title}</h4>
             <p class="task-desc">${desc}</p>
             <div class="task-footer">
               <span><i class="bi bi-person"></i> ${assignee}</span>
-              <span style="color:var(--primary);"><i class="bi bi-chevron-right"></i> ${dict.btnAdvance}</span>
+              <button class="btn btn-outline btn-sm" style="color:var(--primary);padding:0.2rem 0.5rem;" onclick="advanceTask(${task.id})">
+                <span>${dict.btnAdvance}</span> <i class="bi bi-chevron-right"></i>
+              </button>
             </div>
           `;
           container.appendChild(el);
@@ -1091,6 +1287,7 @@
       document.getElementById('kpiReview').textContent = tasks.filter(t => t.status === 'review').length;
       document.getElementById('kpiDone').textContent = tasks.filter(t => t.status === 'done').length;
       document.getElementById('approvalBadge').textContent = tasks.filter(t => t.status === 'review').length;
+      updateSprintVelocity();
     }
 
     function advanceTask(id) {
@@ -1119,6 +1316,53 @@
       renderAudits();
     }
 
+    let taskToDeleteId = null;
+
+    function promptDeleteTask(id, event) {
+      if (event) event.stopPropagation();
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      taskToDeleteId = id;
+      const title = (currentLang === 'tr') ? (task.title_tr || task.title) : (task.title_en || task.title);
+
+      document.getElementById('deleteTaskTargetInfo').innerHTML = `<strong>#${task.id}</strong> &bull; ${title} (${task.prio.toUpperCase()})`;
+      document.getElementById('deleteTaskModal').classList.add('active');
+    }
+
+    function closeDeleteTaskModal() {
+      document.getElementById('deleteTaskModal').classList.remove('active');
+      taskToDeleteId = null;
+    }
+
+    function executeDeleteTask() {
+      if (taskToDeleteId === null) return;
+      const dict = i18n[currentLang] || i18n.tr;
+      const task = tasks.find(t => t.id === taskToDeleteId);
+      const title = task ? ((currentLang === 'tr') ? (task.title_tr || task.title) : (task.title_en || task.title)) : `#${taskToDeleteId}`;
+
+      tasks = tasks.filter(t => t.id !== taskToDeleteId);
+
+      const preset = rolePresets[currentRoleIndex];
+      const activeRole = (currentLang === 'tr') ? preset.trName : preset.enName;
+
+      auditLogs.unshift({
+        user: activeRole,
+        action: 'DELETED',
+        target_tr: `#${taskToDeleteId} (${title}) panodan silindi`,
+        target_en: `Deleted #${taskToDeleteId} (${title}) from board`,
+        time_tr: 'Az önce',
+        time_en: 'Just now'
+      });
+      document.getElementById('kpiAudit').textContent = 1848 + auditLogs.length;
+
+      saveState();
+      renderBoard();
+      renderApprovals();
+      renderAudits();
+      closeDeleteTaskModal();
+      showToast(dict.toastDeleted);
+    }
+
     function renderApprovals() {
       const dict = i18n[currentLang] || i18n.tr;
       const tbody = document.getElementById('approvalsTableBody');
@@ -1141,13 +1385,16 @@
           <td><strong>${title}</strong><div style="font-size:0.8rem;color:var(--text-muted);">${desc}</div></td>
           <td>${assignee}</td>
           <td><span class="task-badge badge-${t.prio}">${t.prio}</span></td>
-          <td>
-            <div style="display:flex;gap:0.4rem;">
+          <td style="text-align:right;white-space:nowrap;">
+            <div style="display:inline-flex;gap:0.4rem;">
               <button class="btn btn-primary" style="padding:0.3rem 0.65rem;font-size:0.8rem;" onclick="resolveReview(${t.id}, true)">
                 <i class="bi bi-check"></i> ${dict.btnSignOff}
               </button>
               <button class="btn btn-outline" style="padding:0.3rem 0.65rem;font-size:0.8rem;color:var(--danger);" onclick="resolveReview(${t.id}, false)">
                 <i class="bi bi-x"></i> ${dict.btnReject}
+              </button>
+              <button class="btn btn-outline" style="padding:0.3rem 0.55rem;font-size:0.8rem;color:var(--danger);border-color:#fca5a5;" onclick="promptDeleteTask(${t.id}, event)" title="${dict.deleteModalTitle}">
+                <i class="bi bi-trash3"></i>
               </button>
             </div>
           </td>
@@ -1167,7 +1414,7 @@
         auditLogs.unshift({
           user: activeRole,
           action: 'CERTIFIED',
-          target_tr: `#${t.id} görevi onaylandı ve yayına alındı`,
+          target_tr: `#${t.id} görevi onaylandı ve tamamlandı`,
           target_en: `Approved and verified #${t.id}`,
           time_tr: 'Az önce',
           time_en: 'Just now'
@@ -1194,15 +1441,19 @@
     function renderAudits() {
       const list = document.getElementById('auditList');
       list.innerHTML = '';
-      auditLogs.slice(0, 10).forEach(a => {
+      auditLogs.slice(0, 12).forEach(a => {
         const target = (currentLang === 'tr') ? (a.target_tr || a.target) : (a.target_en || a.target);
         const time = (currentLang === 'tr') ? (a.time_tr || a.time) : (a.time_en || a.time);
 
+        const isDelete = a.action === 'DELETED';
+        const actionColor = isDelete ? 'var(--danger)' : 'var(--primary)';
+
         const div = document.createElement('div');
         div.className = 'audit-item';
+        div.style.borderLeftColor = actionColor;
         div.innerHTML = `
           <div>
-            <strong>[${a.user}]</strong> &bull; <span style="color:var(--primary);font-weight:bold;">${a.action}</span> &bull; <span>${target}</span>
+            <strong>[${a.user}]</strong> &bull; <span style="color:${actionColor};font-weight:bold;">${a.action}</span> &bull; <span>${target}</span>
           </div>
           <span style="font-size:0.78rem;color:var(--text-muted);">${time}</span>
         `;
@@ -1212,9 +1463,9 @@
 
     function setTab(tab, btn) {
       document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.dock-nav-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`tab-${tab}`).style.display = 'block';
-      btn.classList.add('active');
+      if (btn) btn.classList.add('active');
     }
 
     function openNewTaskModal() { document.getElementById('newTaskModal').classList.add('active'); }
@@ -1224,10 +1475,11 @@
 
     function handleCreateTask(e) {
       e.preventDefault();
-      const title = document.getElementById('taskTitleInput').value;
-      const desc = document.getElementById('taskDescInput').value;
+      const title = document.getElementById('taskTitleInput').value.trim();
+      const desc = document.getElementById('taskDescInput').value.trim();
       const prio = document.getElementById('taskPrioInput').value;
-      const assignee = document.getElementById('taskAssigneeInput').value || 'Proje Yöneticisi';
+      const assignee = document.getElementById('taskAssigneeInput').value.trim() || 'Proje Yöneticisi';
+      const dict = i18n[currentLang] || i18n.tr;
 
       const newId = 100 + tasks.length + 1;
       tasks.push({
@@ -1260,6 +1512,7 @@
       document.getElementById('taskForm').reset();
       renderBoard();
       renderAudits();
+      showToast(`${dict.toastCreated} #${newId}`);
     }
 
     function setRoleByPreset(idx) {
@@ -1267,7 +1520,7 @@
       const preset = rolePresets[idx];
       const name = (currentLang === 'tr') ? preset.trName : preset.enName;
       const role = (currentLang === 'tr') ? preset.trRole : preset.enRole;
-      document.getElementById('userNameText').textContent = `${name} (${role})`;
+      document.getElementById('userNameText').textContent = `${name}`;
 
       auditLogs.unshift({
         user: 'Identity Kernel',
@@ -1287,7 +1540,7 @@
       const email = document.getElementById('loginEmail').value.trim();
       const pass = document.getElementById('loginPassword').value.trim();
       if (!email || !pass) {
-        alert(currentLang === 'tr' ? 'Lütfen kurumsal e-posta ve şifrenizi giriniz.' : 'Please enter corporate email and password.');
+        showToast(currentLang === 'tr' ? 'Lütfen kurumsal e-posta ve şifrenizi giriniz.' : 'Please enter corporate email and password.');
         return;
       }
       
@@ -1302,11 +1555,13 @@
         document.getElementById('loginPortal').style.display = 'none';
         const preset = rolePresets[currentRoleIndex];
         const roleLabel = (currentLang === 'tr') ? preset.trName : preset.enName;
+        showToast(currentLang === 'tr' ? `Giriş başarılı! Aktif Rol: ${roleLabel}` : `Login successful! Active Role: ${roleLabel}`);
       }, 350);
     }
 
     function logoutUser() {
       document.getElementById('loginPortal').style.display = 'flex';
+      showToast(currentLang === 'tr' ? 'Oturum kapatıldı. Giriş ekranına dönüldü.' : 'Logged out. Returned to login portal.');
     }
 
     function setLoginPreset(idx, btn) {
@@ -1323,19 +1578,6 @@
       document.getElementById('displayCredEmail').textContent = emails[idx] || 'devops@taskflow.ops';
       setRoleByPreset(idx);
     }
-
-    function toggleTheme() {
-      const current = document.documentElement.getAttribute('data-theme') || 'light';
-      const next = current === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', next);
-      document.getElementById('themeIcon').className = next === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun';
-      localStorage.setItem('tf_theme', next);
-    }
-
-    // Init Theme & User
-    const savedTheme = localStorage.getItem('tf_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeIcon').className = savedTheme === 'light' ? 'bi bi-moon-stars' : 'bi bi-sun';
 
     // Initialize with Turkish default
     applyLanguage(currentLang);
