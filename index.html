@@ -604,6 +604,7 @@
 
   <!-- Fullscreen Login Portal (Developer Command Deck) -->
   <div class="login-overlay" id="loginPortal">
+    <script>if (localStorage.getItem('tf_logged_in') === 'true') document.getElementById('loginPortal').style.display = 'none';</script>
     <div class="login-box">
       <!-- Top Dev Breadcrumb Bar -->
       <div class="dev-login-topbar">
@@ -1627,6 +1628,7 @@
       setTimeout(() => {
         btn.innerHTML = origHtml;
         btn.disabled = false;
+        localStorage.setItem('tf_logged_in', 'true');
         document.getElementById('loginPortal').style.display = 'none';
         const preset = rolePresets[currentRoleIndex];
         const roleLabel = (currentLang === 'tr') ? preset.trName : preset.enName;
@@ -1635,6 +1637,7 @@
     }
 
     function logoutUser() {
+      localStorage.removeItem('tf_logged_in');
       document.getElementById('loginPortal').style.display = 'flex';
       showToast(currentLang === 'tr' ? 'Oturum kapatıldı. Giriş ekranına dönüldü.' : 'Logged out. Returned to login portal.');
     }
@@ -1656,6 +1659,10 @@
 
     // Initialize with Turkish default
     applyLanguage(currentLang);
+    if (localStorage.getItem('tf_logged_in') === 'true') {
+      const p = document.getElementById('loginPortal');
+      if (p) p.style.display = 'none';
+    }
     saveState();
   </script>
 </body>
